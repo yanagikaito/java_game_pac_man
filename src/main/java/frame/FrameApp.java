@@ -2,7 +2,7 @@ package frame;
 
 public class FrameApp {
 
-    private static final int maxScreenRow = 21;
+    private static final int maxScreenRow = 22;
     private static final int maxScreenCol = 19;
     private static final int tileSize = createSize();
     private static final int screenWidth = tileSize * maxScreenCol;
