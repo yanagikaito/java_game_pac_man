@@ -1,5 +1,6 @@
 package window;
 
+import collision.CollisionChecker;
 import entity.Player;
 import factory.FrameFactory;
 import frame.GameFrame;
@@ -19,6 +20,7 @@ public class GameWindow extends JPanel implements Window, Runnable {
     private TileManager tileManager = new TileManager(this);
     private static GameWindow instance;
     private Thread gameThread;
+    private CollisionChecker collisionChecker = new CollisionChecker(this);
 
     private GameWindow() {
         this.setBackground(Color.BLACK);
@@ -91,5 +93,13 @@ public class GameWindow extends JPanel implements Window, Runnable {
         player.draw(g2);
 
         g2.dispose();
+    }
+
+    public CollisionChecker getCollisionChecker() {
+        return collisionChecker;
+    }
+
+    public TileManager getTileManager() {
+        return tileManager;
     }
 }

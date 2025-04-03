@@ -21,13 +21,19 @@ public class Player extends Entity {
         this.gameWindow = gameWindow;
         this.keyHandler = keyHandler;
 
+        solidArea = new Rectangle();
+        solidArea.x = FrameApp.createSize() / 6;
+        solidArea.y = FrameApp.createSize() / 3;
+        solidArea.width = FrameApp.createSize() - 16;
+        solidArea.height = FrameApp.createSize() - 16;
+
         setDefaultValues();
         loadPlayerImages();
     }
 
     public void setDefaultValues() {
-        x = 100;
-        y = 100;
+        x = FrameApp.createSize() * 9;
+        y = FrameApp.createSize() * 15;
         speed = 2;
         direction = "left";
     }
@@ -50,16 +56,25 @@ public class Player extends Entity {
 
             if (keyHandler.pacmanUp) {
                 direction = "up";
-                y -= speed;
             } else if (keyHandler.pacmanDown) {
                 direction = "down";
-                y += speed;
             } else if (keyHandler.pacmanRight) {
                 direction = "right";
-                x += speed;
             } else if (keyHandler.pacmanLeft) {
                 direction = "left";
-                x -= speed;
+            }
+
+            collision = false;
+            gameWindow.getCollisionChecker().checkTile(this);
+
+            if (collision == false) {
+
+                switch (direction) {
+                    case "up" -> y -= speed;
+                    case "down" -> y += speed;
+                    case "right" -> x += speed;
+                    case "left" -> x -= speed;
+                }
             }
 
             spriteCounter++;

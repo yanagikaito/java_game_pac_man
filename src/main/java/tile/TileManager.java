@@ -13,8 +13,8 @@ import java.io.InputStreamReader;
 public class TileManager {
 
     private GameWindow gameWindow;
-    private Tile[] tile;
-    private int mapTileNum[][];
+    public Tile[] tile;
+    public int[][] mapTileNum;
 
     public TileManager(GameWindow gameWindow) {
         this.gameWindow = gameWindow;
@@ -34,6 +34,7 @@ public class TileManager {
             tile[1].image = ImageIO.read(getClass().getClassLoader().getResourceAsStream("food/food.gif"));
             tile[2] = new Tile();
             tile[2].image = ImageIO.read(getClass().getClassLoader().getResourceAsStream("wall/wall.gif"));
+            tile[2].collision = true;
 
         } catch (IOException e) {
             e.printStackTrace();
