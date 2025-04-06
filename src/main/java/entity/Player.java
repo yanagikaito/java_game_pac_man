@@ -14,10 +14,11 @@ public class Player extends Entity {
     private static final int SPRITE_COUNT = 3;
     private BufferedImage[][] sprites = new BufferedImage[DIRECTIONS.length][SPRITE_COUNT];
 
-    GameWindow gameWindow;
-    KeyHandler keyHandler;
+    private GameWindow gameWindow;
+    private KeyHandler keyHandler;
 
     public Player(GameWindow gameWindow, KeyHandler keyHandler) {
+        super(gameWindow);
         this.gameWindow = gameWindow;
         this.keyHandler = keyHandler;
 

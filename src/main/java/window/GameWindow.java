@@ -1,6 +1,7 @@
 package window;
 
 import collision.CollisionChecker;
+import entity.Entity;
 import entity.Player;
 import factory.FrameFactory;
 import frame.GameFrame;
@@ -17,6 +18,7 @@ public class GameWindow extends JPanel implements Window, Runnable {
     private GameFrame gameFrame = FrameFactory.createFrame(baseDisplay(), this);
     private KeyHandler keyHandler = new KeyHandler(this);
     private Player player = new Player(this, keyHandler);
+    private Entity[] ghost = new Entity[5];
     private TileManager tileManager = new TileManager(this);
     private static GameWindow instance;
     private Thread gameThread;
@@ -91,7 +93,6 @@ public class GameWindow extends JPanel implements Window, Runnable {
 
         tileManager.draw(g2);
         player.draw(g2);
-
         g2.dispose();
     }
 
