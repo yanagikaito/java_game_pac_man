@@ -36,15 +36,6 @@ public class TileManager {
             tile[2].image = ImageIO.read(getClass().getClassLoader().getResourceAsStream("wall/wall.gif"));
             tile[2].collision = true;
 
-            tile[3] = new Tile();
-            tile[3].image = ImageIO.read(getClass().getClassLoader().getResourceAsStream("ghost/blue_ghost.gif"));
-            tile[4] = new Tile();
-            tile[4].image = ImageIO.read(getClass().getClassLoader().getResourceAsStream("ghost/orange_ghost.gif"));
-            tile[5] = new Tile();
-            tile[5].image = ImageIO.read(getClass().getClassLoader().getResourceAsStream("ghost/pink_ghost.gif"));
-            tile[6] = new Tile();
-            tile[6].image = ImageIO.read(getClass().getClassLoader().getResourceAsStream("ghost/red_ghost.gif"));
-
         } catch (IOException e) {
             e.printStackTrace();
         }

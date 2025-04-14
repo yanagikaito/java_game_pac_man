@@ -1,5 +1,6 @@
 package window;
 
+import asset.AssetSetter;
 import collision.CollisionChecker;
 import entity.Entity;
 import entity.Player;
@@ -18,8 +19,9 @@ public class GameWindow extends JPanel implements Window, Runnable {
     private GameFrame gameFrame = FrameFactory.createFrame(baseDisplay(), this);
     private KeyHandler keyHandler = new KeyHandler(this);
     private Player player = new Player(this, keyHandler);
-    private Entity[] ghost = new Entity[5];
+    private Entity[] ghost = new Entity[4];
     private TileManager tileManager = new TileManager(this);
+    private AssetSetter assetSetter = new AssetSetter(this);
     private static GameWindow instance;
     private Thread gameThread;
     private CollisionChecker collisionChecker = new CollisionChecker(this);
@@ -32,6 +34,11 @@ public class GameWindow extends JPanel implements Window, Runnable {
         this.setFocusable(true);
         this.setLayout(null);
         this.addKeyListener(keyHandler);
+        this.initGhosts();
+    }
+
+    private void initGhosts() {
+        assetSetter.setGhost();
     }
 
     public static synchronized GameWindow getInstance() {
@@ -85,6 +92,11 @@ public class GameWindow extends JPanel implements Window, Runnable {
 
     public void update() {
         player.update();
+        for (int i = 0; i < ghost.length; i++) {
+            if (ghost[i] != null) {
+                ghost[i].update();
+            }
+        }
     }
 
     public void paintComponent(Graphics g) {
@@ -93,6 +105,11 @@ public class GameWindow extends JPanel implements Window, Runnable {
 
         tileManager.draw(g2);
         player.draw(g2);
+        for (Entity ghostEntity : ghost) {
+            if (ghostEntity != null) {
+                ghostEntity.draw(g2);
+            }
+        }
         g2.dispose();
     }
 
@@ -102,5 +119,13 @@ public class GameWindow extends JPanel implements Window, Runnable {
 
     public TileManager getTileManager() {
         return tileManager;
+    }
+
+    public Entity[] getGhost() {
+        return ghost;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 }
