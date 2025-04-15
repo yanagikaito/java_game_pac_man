@@ -13,10 +13,11 @@ public class Entity {
     public int y;
     public int speed;
 
-    public int ghostType;
     public BufferedImage blue_ghost_Image;
     public BufferedImage orange_ghost_Image;
     public BufferedImage pink_ghost_Image;
+
+    // red
     public BufferedImage red_ghost_Image_up1;
     public BufferedImage red_ghost_Image_up2;
     public BufferedImage red_ghost_Image_down1;
@@ -26,6 +27,36 @@ public class Entity {
     public BufferedImage red_ghost_Image_right1;
     public BufferedImage red_ghost_Image_right2;
 
+    // blue
+    public BufferedImage blue_ghost_Image_up1;
+    public BufferedImage blue_ghost_Image_up2;
+    public BufferedImage blue_ghost_Image_down1;
+    public BufferedImage blue_ghost_Image_down2;
+    public BufferedImage blue_ghost_Image_left1;
+    public BufferedImage blue_ghost_Image_left2;
+    public BufferedImage blue_ghost_Image_right1;
+    public BufferedImage blue_ghost_Image_right2;
+
+    // orange
+    public BufferedImage orange_ghost_Image_up1;
+    public BufferedImage orange_ghost_Image_up2;
+    public BufferedImage orange_ghost_Image_down1;
+    public BufferedImage orange_ghost_Image_down2;
+    public BufferedImage orange_ghost_Image_left1;
+    public BufferedImage orange_ghost_Image_left2;
+    public BufferedImage orange_ghost_Image_right1;
+    public BufferedImage orange_ghost_Image_right2;
+
+    // pink
+    public BufferedImage pink_ghost_Image_up1;
+    public BufferedImage pink_ghost_Image_up2;
+    public BufferedImage pink_ghost_Image_down1;
+    public BufferedImage pink_ghost_Image_down2;
+    public BufferedImage pink_ghost_Image_left1;
+    public BufferedImage pink_ghost_Image_left2;
+    public BufferedImage pink_ghost_Image_right1;
+    public BufferedImage pink_ghost_Image_right2;
+
     // 方向とスプライトの配列
     // 4方向 × 3スプライト
     public BufferedImage[][] sprites = new BufferedImage[4][3];
@@ -34,7 +65,7 @@ public class Entity {
     public int spriteCounter = 0;
     public int spriteNum = 1;
 
-    public Rectangle solidArea = new Rectangle(0, 0, 48, 48);
+    public Rectangle solidArea = new Rectangle(8, 16, 16, 16);
     public boolean collision = false;
 
     public static final String[] DIRECTIONS = {"up", "down", "left", "right"};
@@ -76,6 +107,7 @@ public class Entity {
     }
 
     public void draw(Graphics2D g2) {
+
         BufferedImage image = null;
 
         switch (direction) {
@@ -107,9 +139,6 @@ public class Entity {
                     image = red_ghost_Image_right2;
                 }
             }
-//                case 1 -> image = orange_ghost_Image;
-//                case 2 -> image = pink_ghost_Image;
-//                case 3 -> image = red_ghost_Image;
         }
         if (image != null) {
             g2.drawImage(image, x, y, FrameApp.createSize(), FrameApp.createSize(), null);

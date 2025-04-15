@@ -86,6 +86,7 @@ public class Player extends Entity {
         }
     }
 
+    @Override
     public void draw(Graphics2D g2) {
         BufferedImage image = null;
         int dirIndex = java.util.Arrays.asList(DIRECTIONS).indexOf(direction);
