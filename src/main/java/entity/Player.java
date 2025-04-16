@@ -23,8 +23,8 @@ public class Player extends Entity {
         this.keyHandler = keyHandler;
 
         solidArea = new Rectangle();
-        solidArea.x = FrameApp.createSize() / 6;
-        solidArea.y = FrameApp.createSize() / 3;
+        solidArea.x = 0;
+        solidArea.y = 0;
         solidArea.width = FrameApp.createSize() - 16;
         solidArea.height = FrameApp.createSize() - 16;
 
