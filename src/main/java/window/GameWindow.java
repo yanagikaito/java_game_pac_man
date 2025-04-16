@@ -5,6 +5,7 @@ import collision.CollisionChecker;
 import entity.Entity;
 import entity.Player;
 import factory.FrameFactory;
+import frame.FrameApp;
 import frame.GameFrame;
 import key.KeyHandler;
 import tile.TileManager;
@@ -25,6 +26,7 @@ public class GameWindow extends JPanel implements Window, Runnable {
     private static GameWindow instance;
     private Thread gameThread;
     private CollisionChecker collisionChecker = new CollisionChecker(this);
+    private int score = 0;
 
     private GameWindow() {
         this.setBackground(Color.BLACK);
@@ -92,6 +94,12 @@ public class GameWindow extends JPanel implements Window, Runnable {
 
     public void update() {
         player.update();
+        int playerCol = player.x / FrameApp.createSize();
+        int playerRow = player.y / FrameApp.createSize();
+        if (tileManager.mapTileNum[playerCol][playerRow] == 1) {
+            tileManager.mapTileNum[playerCol][playerRow] = 0; // 食べ物を削除
+            score += 10;
+        }
         for (int i = 0; i < ghost.length; i++) {
             if (ghost[i] != null) {
                 ghost[i].update();
@@ -110,6 +118,11 @@ public class GameWindow extends JPanel implements Window, Runnable {
                 ghostEntity.draw(g2);
             }
         }
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("Arial", Font.BOLD, 20));
+        g2.drawString("Score: " + score, 10, 20);
+
         g2.dispose();
     }
 
@@ -123,9 +136,5 @@ public class GameWindow extends JPanel implements Window, Runnable {
 
     public Entity[] getGhost() {
         return ghost;
-    }
-
-    public Player getPlayer() {
-        return player;
     }
 }

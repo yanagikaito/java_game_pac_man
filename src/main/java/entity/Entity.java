@@ -65,7 +65,7 @@ public class Entity {
     public int spriteCounter = 0;
     public int spriteNum = 1;
 
-    public Rectangle solidArea = new Rectangle(8, 16, 16, 16);
+    public Rectangle solidArea = new Rectangle(0, 0, 16, 16);
     public boolean collision = false;
 
     public static final String[] DIRECTIONS = {"up", "down", "left", "right"};
