@@ -8,6 +8,7 @@ import factory.FrameFactory;
 import frame.FrameApp;
 import frame.GameFrame;
 import key.KeyHandler;
+import sound.SoundManager;
 import tile.TileManager;
 
 import javax.swing.*;
@@ -26,6 +27,7 @@ public class GameWindow extends JPanel implements Window, Runnable {
     private static GameWindow instance;
     private Thread gameThread;
     private CollisionChecker collisionChecker = new CollisionChecker(this);
+    private SoundManager soundManager = new SoundManager(this);
     private int score = 0;
 
     private GameWindow() {
@@ -37,6 +39,7 @@ public class GameWindow extends JPanel implements Window, Runnable {
         this.setLayout(null);
         this.addKeyListener(keyHandler);
         this.initGhosts();
+        this.soundManager.playStartWAV("res/sound/game-start-sound.wav");
     }
 
     private void initGhosts() {
@@ -97,8 +100,9 @@ public class GameWindow extends JPanel implements Window, Runnable {
         int playerCol = player.x / FrameApp.createSize();
         int playerRow = player.y / FrameApp.createSize();
         if (tileManager.mapTileNum[playerCol][playerRow] == 1) {
-            tileManager.mapTileNum[playerCol][playerRow] = 0; // 食べ物を削除
+            tileManager.mapTileNum[playerCol][playerRow] = 0;
             score += 10;
+            soundManager.playFoodWAV("res/sound/food-sound.wav");
         }
         for (int i = 0; i < ghost.length; i++) {
             if (ghost[i] != null) {
@@ -120,8 +124,8 @@ public class GameWindow extends JPanel implements Window, Runnable {
         }
 
         g2.setColor(Color.WHITE);
-        g2.setFont(new Font("Arial", Font.BOLD, 20));
-        g2.drawString("Score: " + score, 10, 20);
+        g2.setFont(new Font("Arial", Font.BOLD, 15));
+        g2.drawString("SCORE: " + score, 10, 20);
 
         g2.dispose();
     }
