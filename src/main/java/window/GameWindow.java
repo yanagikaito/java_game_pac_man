@@ -138,7 +138,15 @@ public class GameWindow extends JPanel implements Window, Runnable {
         return tileManager;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
     public Entity[] getGhost() {
         return ghost;
+    }
+
+    public SoundManager getSoundManager() {
+        return soundManager;
     }
 }

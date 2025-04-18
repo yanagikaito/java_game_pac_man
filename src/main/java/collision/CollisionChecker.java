@@ -61,4 +61,97 @@ public class CollisionChecker {
             }
         }
     }
+
+    public int checkEntity(Entity entity, Entity[] target) {
+
+        int index = 999;
+
+        for (int i = 0; i < target.length; i++) {
+
+            if (target[i] != null) {
+
+                entity.solidArea.x = entity.x + entity.solidArea.x;
+                entity.solidArea.y = entity.y + entity.solidArea.y;
+
+                target[i].solidArea.x = target[i].x + target[i].solidArea.x;
+                target[i].solidArea.y = target[i].y + target[i].solidArea.y;
+
+                switch (entity.direction) {
+                    case "up" -> {
+                        entity.solidArea.y -= entity.speed;
+                        if (entity.solidArea.intersects(target[i].solidArea)) {
+                            entity.collision = true;
+                            index = i;
+                        }
+                    }
+                    case "down" -> {
+                        entity.solidArea.y += entity.speed;
+                        if (entity.solidArea.intersects(target[i].solidArea)) {
+                            entity.collision = true;
+                            index = i;
+                        }
+                    }
+                    case "left" -> {
+                        entity.solidArea.x -= entity.speed;
+                        if (entity.solidArea.intersects(target[i].solidArea)) {
+                            entity.collision = true;
+                            index = i;
+                        }
+                    }
+                    case "right" -> {
+                        entity.solidArea.x += entity.speed;
+                        if (entity.solidArea.intersects(target[i].solidArea)) {
+                            entity.collision = true;
+                            index = i;
+                        }
+                    }
+                }
+                entity.solidArea.x = entity.solidAreaDefaultX;
+                entity.solidArea.y = entity.solidAreaDefaultY;
+                target[i].solidArea.x = target[i].solidAreaDefaultX;
+                target[i].solidArea.y = target[i].solidAreaDefaultY;
+            }
+        }
+        return index;
+    }
+
+    public void checkPlayer(Entity entity) {
+
+        entity.solidArea.x = entity.x + entity.solidArea.x;
+        entity.solidArea.y = entity.y + entity.solidArea.y;
+
+        gameWindow.getPlayer().solidArea.x = gameWindow.getPlayer().x + gameWindow.getPlayer().solidArea.x;
+        gameWindow.getPlayer().solidArea.y = gameWindow.getPlayer().y + gameWindow.getPlayer().solidArea.y;
+
+        switch (entity.direction) {
+            case "up" -> {
+                entity.solidArea.y -= entity.speed;
+                if (entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
+                    entity.collision = true;
+                }
+            }
+            case "down" -> {
+                entity.solidArea.y += entity.speed;
+                if (entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
+                    entity.collision = true;
+                }
+            }
+            case "left" -> {
+                entity.solidArea.x -= entity.speed;
+                if (entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
+                    entity.collision = true;
+                }
+            }
+            case "right" -> {
+                entity.solidArea.x += entity.speed;
+                if (entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
+                    entity.collision = true;
+                }
+            }
+        }
+        entity.solidArea.x = entity.solidAreaDefaultX;
+        entity.solidArea.y = entity.solidAreaDefaultY;
+        gameWindow.getPlayer().solidArea.x = gameWindow.getPlayer().solidAreaDefaultX;
+        gameWindow.getPlayer().solidArea.y = gameWindow.getPlayer().solidAreaDefaultY;
+    }
 }

@@ -68,6 +68,9 @@ public class Player extends Entity {
             collision = false;
             gameWindow.getCollisionChecker().checkTile(this);
 
+            int ghostIndex = gameWindow.getCollisionChecker().checkEntity(this, gameWindow.getGhost());
+            interactGHOST(ghostIndex);
+
             if (collision == false) {
 
                 switch (direction) {
@@ -83,6 +86,13 @@ public class Player extends Entity {
                 spriteNum = (spriteNum % SPRITE_COUNT) + 1;
                 spriteCounter = 0;
             }
+        }
+    }
+
+    public void interactGHOST(int i) {
+
+        if(i != 999) {
+            System.out.println("hit");
         }
     }
 
