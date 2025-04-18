@@ -13,10 +13,6 @@ public class Entity {
     public int y;
     public int speed;
 
-    public BufferedImage blue_ghost_Image;
-    public BufferedImage orange_ghost_Image;
-    public BufferedImage pink_ghost_Image;
-
     // red
     public BufferedImage red_ghost_Image_up1;
     public BufferedImage red_ghost_Image_up2;
@@ -57,6 +53,7 @@ public class Entity {
     public BufferedImage pink_ghost_Image_right1;
     public BufferedImage pink_ghost_Image_right2;
 
+
     // 方向とスプライトの配列
     // 4方向 × 3スプライト
     public BufferedImage[][] sprites = new BufferedImage[4][3];
@@ -65,7 +62,13 @@ public class Entity {
     public int spriteCounter = 0;
     public int spriteNum = 1;
 
-    public Rectangle solidArea = new Rectangle(0, 0, 16, 16);
+    public int width = 16;
+    public int height = 16;
+    public int entityX = 0;
+    public int entityY = 0;
+    public int solidAreaDefaultX;
+    public int solidAreaDefaultY;
+    public Rectangle solidArea = new Rectangle(entityX, entityY, width, height);
     public boolean collision = false;
 
     public static final String[] DIRECTIONS = {"up", "down", "left", "right"};
@@ -84,6 +87,7 @@ public class Entity {
 
         collision = false;
         gameWindow.getCollisionChecker().checkTile(this);
+        gameWindow.getCollisionChecker().checkPlayer(this);
 
         if (collision == false) {
 
