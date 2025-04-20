@@ -91,7 +91,10 @@ public class Player extends Entity {
 
     public void interactGHOST(int i) {
 
-        if(i != 999) {
+        if (i != 999) {
+            gameWindow.setGameState(gameWindow.getGameOverState());
+            gameWindow.getGameOver().triggerGameOver();
+            gameWindow.getGameOver().update();
             System.out.println("hit");
         }
     }

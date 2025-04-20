@@ -128,24 +128,36 @@ public class CollisionChecker {
                 entity.solidArea.y -= entity.speed;
                 if (entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
                     entity.collision = true;
+                    gameWindow.setGameState(gameWindow.getGameOverState());
+                    gameWindow.getGameOver().triggerGameOver();
+                    gameWindow.getGameOver().update();
                 }
             }
             case "down" -> {
                 entity.solidArea.y += entity.speed;
                 if (entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
                     entity.collision = true;
+                    gameWindow.setGameState(gameWindow.getGameOverState());
+                    gameWindow.getGameOver().triggerGameOver();
+                    gameWindow.getGameOver().update();
                 }
             }
             case "left" -> {
                 entity.solidArea.x -= entity.speed;
                 if (entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
                     entity.collision = true;
+                    gameWindow.setGameState(gameWindow.getGameOverState());
+                    gameWindow.getGameOver().triggerGameOver();
+                    gameWindow.getGameOver().update();
                 }
             }
             case "right" -> {
                 entity.solidArea.x += entity.speed;
                 if (entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
                     entity.collision = true;
+                    gameWindow.setGameState(gameWindow.getGameOverState());
+                    gameWindow.getGameOver().triggerGameOver();
+                    gameWindow.getGameOver().update();
                 }
             }
         }
