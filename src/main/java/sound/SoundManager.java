@@ -22,6 +22,10 @@ public class SoundManager {
         playWAV(filePath);
     }
 
+    public void playGameOverWAV(String filePath) {
+        playWAV(filePath);
+    }
+
     private void playWAV(String filePath) {
 
         try {

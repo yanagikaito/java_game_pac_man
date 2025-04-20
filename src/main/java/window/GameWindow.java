@@ -7,6 +7,7 @@ import entity.Player;
 import factory.FrameFactory;
 import frame.FrameApp;
 import frame.GameFrame;
+import game.GameOver;
 import key.KeyHandler;
 import sound.SoundManager;
 import tile.TileManager;
@@ -24,10 +25,14 @@ public class GameWindow extends JPanel implements Window, Runnable {
     private Entity[] ghost = new Entity[4];
     private TileManager tileManager = new TileManager(this);
     private AssetSetter assetSetter = new AssetSetter(this);
+    private GameOver gameOver = new GameOver(this);
     private static GameWindow instance;
     private Thread gameThread;
     private CollisionChecker collisionChecker = new CollisionChecker(this);
     private SoundManager soundManager = new SoundManager(this);
+    private int gameState;
+    private final int playState = 1;
+    private final int gameOverState = 2;
     private int score = 0;
 
     private GameWindow() {
@@ -40,6 +45,7 @@ public class GameWindow extends JPanel implements Window, Runnable {
         this.addKeyListener(keyHandler);
         this.initGhosts();
         this.soundManager.playStartWAV("res/sound/game-start-sound.wav");
+        this.gameState = playState;
     }
 
     private void initGhosts() {
@@ -96,18 +102,23 @@ public class GameWindow extends JPanel implements Window, Runnable {
     }
 
     public void update() {
-        player.update();
-        int playerCol = player.x / FrameApp.createSize();
-        int playerRow = player.y / FrameApp.createSize();
-        if (tileManager.mapTileNum[playerCol][playerRow] == 1) {
-            tileManager.mapTileNum[playerCol][playerRow] = 0;
-            score += 10;
-            soundManager.playFoodWAV("res/sound/food-sound.wav");
-        }
-        for (int i = 0; i < ghost.length; i++) {
-            if (ghost[i] != null) {
-                ghost[i].update();
+        if (gameState == playState) {
+            player.update();
+            int playerCol = player.x / FrameApp.createSize();
+            int playerRow = player.y / FrameApp.createSize();
+            if (tileManager.mapTileNum[playerCol][playerRow] == 1) {
+                tileManager.mapTileNum[playerCol][playerRow] = 0;
+                score += 10;
+                soundManager.playFoodWAV("res/sound/food-sound.wav");
             }
+            for (int i = 0; i < ghost.length; i++) {
+                if (ghost[i] != null) {
+                    ghost[i].update();
+                }
+            }
+        }
+        if (gameState == gameOverState) {
+            gameOver.update();
         }
     }
 
@@ -115,12 +126,20 @@ public class GameWindow extends JPanel implements Window, Runnable {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
-        tileManager.draw(g2);
-        player.draw(g2);
-        for (Entity ghostEntity : ghost) {
-            if (ghostEntity != null) {
-                ghostEntity.draw(g2);
+        if (gameState == playState) {
+            tileManager.draw(g2);
+            player.draw(g2);
+            for (Entity ghostEntity : ghost) {
+                if (ghostEntity != null) {
+                    ghostEntity.draw(g2);
+                }
             }
+        }
+        if (gameState == gameOverState) {
+            gameOver.draw(g2);
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Arial", Font.BOLD, 50));
+            g2.drawString("GAME OVER ", 150, 200);
         }
 
         g2.setColor(Color.WHITE);
@@ -148,5 +167,21 @@ public class GameWindow extends JPanel implements Window, Runnable {
 
     public SoundManager getSoundManager() {
         return soundManager;
+    }
+
+    public int getGameState() {
+        return gameOverState;
+    }
+
+    public int getGameOverState() {
+        return gameOverState;
+    }
+
+    public GameOver getGameOver() {
+        return gameOver;
+    }
+
+    public void setGameState(int state) {
+        this.gameState = state;
     }
 }

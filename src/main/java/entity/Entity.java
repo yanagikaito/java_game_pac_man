@@ -53,6 +53,12 @@ public class Entity {
     public BufferedImage pink_ghost_Image_right1;
     public BufferedImage pink_ghost_Image_right2;
 
+    // game over
+    public BufferedImage game_over_Image_1;
+    public BufferedImage game_over_Image_2;
+    public BufferedImage game_over_Image_3;
+    public BufferedImage game_over_Image_4;
+    public BufferedImage game_over_Image_5;
 
     // 方向とスプライトの配列
     // 4方向 × 3スプライト
