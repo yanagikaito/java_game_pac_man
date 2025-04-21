@@ -11,7 +11,9 @@ import game.GameOver;
 import key.KeyHandler;
 import sound.SoundManager;
 import tile.TileManager;
+import ui.UI;
 
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 
@@ -30,7 +32,11 @@ public class GameWindow extends JPanel implements Window, Runnable {
     private Thread gameThread;
     private CollisionChecker collisionChecker = new CollisionChecker(this);
     private SoundManager soundManager = new SoundManager(this);
+    private UI ui = new UI(this);
+    private boolean isPlayBackgroundMusic = false;
+    private boolean isStartBGMPlaying = false;
     private int gameState;
+    private final int titleState = 0;
     private final int playState = 1;
     private final int gameOverState = 2;
     private int score = 0;
@@ -43,14 +49,18 @@ public class GameWindow extends JPanel implements Window, Runnable {
         this.setFocusable(true);
         this.setLayout(null);
         this.addKeyListener(keyHandler);
-        this.initGhosts();
-        this.soundManager.playStartWAV("res/sound/game-start-sound.wav");
-        this.gameState = playState;
+        this.setupGame();
+    }
+
+    private void setupGame() {
+        initGhosts();
+        gameState = titleState;
     }
 
     private void initGhosts() {
         assetSetter.setGhost();
     }
+
 
     public static synchronized GameWindow getInstance() {
         if (instance == null) {
@@ -101,14 +111,37 @@ public class GameWindow extends JPanel implements Window, Runnable {
         gameThread.start();
     }
 
+    public void startGame() {
+        isStartBGMPlaying = true;
+        soundManager.playStartWAV("res/sound/game-start-sound.wav", this::onStartBGMEnd);
+    }
+
+    private void onStartBGMEnd() {
+        isStartBGMPlaying = false;
+        gameState = playState;
+        System.out.println("パックマンの動きを開始！");
+    }
+
     public void update() {
+        if (isStartBGMPlaying) {
+            return;
+        }
         if (gameState == playState) {
             player.update();
+            if (!isPlayBackgroundMusic) {
+                soundManager.playBackgroundWAV("res/sound/game-background-sound.wav");
+                isPlayBackgroundMusic = true;
+            }
             int playerCol = player.x / FrameApp.createSize();
             int playerRow = player.y / FrameApp.createSize();
             if (tileManager.mapTileNum[playerCol][playerRow] == 1) {
                 tileManager.mapTileNum[playerCol][playerRow] = 0;
                 score += 10;
+                soundManager.playFoodWAV("res/sound/food-sound.wav");
+            }
+            if (tileManager.mapTileNum[playerCol][playerRow] == 3) {
+                tileManager.mapTileNum[playerCol][playerRow] = 0;
+                score += 50;
                 soundManager.playFoodWAV("res/sound/food-sound.wav");
             }
             for (int i = 0; i < ghost.length; i++) {
@@ -126,7 +159,9 @@ public class GameWindow extends JPanel implements Window, Runnable {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
-        if (gameState == playState) {
+        if (gameState == titleState) {
+            ui.draw(g2);
+        } else if (gameState == playState) {
             tileManager.draw(g2);
             player.draw(g2);
             for (Entity ghostEntity : ghost) {
@@ -134,6 +169,10 @@ public class GameWindow extends JPanel implements Window, Runnable {
                     ghostEntity.draw(g2);
                 }
             }
+
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Arial", Font.BOLD, 15));
+            g2.drawString("SCORE: " + score, 10, 20);
         }
         if (gameState == gameOverState) {
             gameOver.draw(g2);
@@ -141,10 +180,6 @@ public class GameWindow extends JPanel implements Window, Runnable {
             g2.setFont(new Font("Arial", Font.BOLD, 50));
             g2.drawString("GAME OVER ", 150, 200);
         }
-
-        g2.setColor(Color.WHITE);
-        g2.setFont(new Font("Arial", Font.BOLD, 15));
-        g2.drawString("SCORE: " + score, 10, 20);
 
         g2.dispose();
     }
@@ -169,19 +204,27 @@ public class GameWindow extends JPanel implements Window, Runnable {
         return soundManager;
     }
 
-    public int getGameState() {
+    public int getGameOverState() {
         return gameOverState;
     }
 
-    public int getGameOverState() {
-        return gameOverState;
+    public int getPlayState() {
+        return playState;
     }
 
     public GameOver getGameOver() {
         return gameOver;
     }
 
+    public int getTitleState() {
+        return titleState;
+    }
+
     public void setGameState(int state) {
         this.gameState = state;
+    }
+
+    public UI getUi() {
+        return ui;
     }
 }
