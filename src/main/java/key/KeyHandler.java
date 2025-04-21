@@ -24,6 +24,13 @@ public class KeyHandler implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
+
+        if(code == KeyEvent.VK_ENTER) {
+            if(gameWindow.getUi().getCommandNum() == 0) {
+                gameWindow.setGameState(gameWindow.getPlayState());
+                gameWindow.startGame();
+            }
+        }
         if (code == KeyEvent.VK_W) {
             pacmanUp = true;
         }

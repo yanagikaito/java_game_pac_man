@@ -18,7 +18,7 @@ public class TileManager {
 
     public TileManager(GameWindow gameWindow) {
         this.gameWindow = gameWindow;
-        tile = new Tile[7];
+        tile = new Tile[4];
         mapTileNum = new int[FrameApp.getScreenWidth()][FrameApp.getScreenHeight()];
         getTileImage();
         loadMap("map/map.text.txt");
@@ -35,6 +35,8 @@ public class TileManager {
             tile[2] = new Tile();
             tile[2].image = ImageIO.read(getClass().getClassLoader().getResourceAsStream("wall/wall.gif"));
             tile[2].collision = true;
+            tile[3] = new Tile();
+            tile[3].image = ImageIO.read(getClass().getClassLoader().getResourceAsStream("food/power-food.gif"));
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -29,7 +29,7 @@ public class GameOver extends Entity {
     }
 
     public void triggerGameOver() {
-        gameWindow.getSoundManager().playGameOverWAV("res/sound/game-over.wav");
+        gameWindow.getSoundManager().playGameOverWAV("res/sound/game-over-sound.wav");
     }
 
     public void update() {
