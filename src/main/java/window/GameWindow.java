@@ -2,8 +2,7 @@ package window;
 
 import asset.AssetSetter;
 import collision.CollisionChecker;
-import entity.Entity;
-import entity.Player;
+import entity.*;
 import factory.FrameFactory;
 import frame.FrameApp;
 import frame.GameFrame;
@@ -13,7 +12,6 @@ import sound.SoundManager;
 import tile.TileManager;
 import ui.UI;
 
-import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 
@@ -35,6 +33,9 @@ public class GameWindow extends JPanel implements Window, Runnable {
     private UI ui = new UI(this);
     private boolean isPlayBackgroundMusic = false;
     private boolean isStartBGMPlaying = false;
+    private boolean isPowerModeActive = false;
+    private long powerModeStartTime = 0;
+    private final long powerModeDuration = 5000;
     private int gameState;
     private final int titleState = 0;
     private final int playState = 1;
@@ -143,7 +144,30 @@ public class GameWindow extends JPanel implements Window, Runnable {
                 tileManager.mapTileNum[playerCol][playerRow] = 0;
                 score += 50;
                 soundManager.playFoodWAV("res/sound/food-sound.wav");
+
+                activatePowerMode();
             }
+            // パワーモード中の効果時間チェック
+            if (isPowerModeActive) {
+                long elapsed = System.currentTimeMillis() - powerModeStartTime;
+                if (elapsed >= powerModeDuration) {
+                    deactivatePowerMode();
+                } else if (powerModeDuration - elapsed < 1000) {
+                    for (int i = 0; i < ghost.length; i++) {
+                        if (ghost[i] != null) {
+                            ghost[i].setWarningMode(true);
+                        }
+                    }
+                } else {
+                    // 警告状態でなければ解除
+                    for (int i = 0; i < ghost.length; i++) {
+                        if (ghost[i] != null) {
+                            ghost[i].setWarningMode(false);
+                        }
+                    }
+                }
+            }
+
             for (int i = 0; i < ghost.length; i++) {
                 if (ghost[i] != null) {
                     ghost[i].update();
@@ -152,6 +176,61 @@ public class GameWindow extends JPanel implements Window, Runnable {
         }
         if (gameState == gameOverState) {
             gameOver.update();
+        }
+    }
+
+    private void activatePowerMode() {
+        isPowerModeActive = true;
+        powerModeStartTime = System.currentTimeMillis();
+
+        // ゴーストを全てイジケモードへ
+        for (int i = 0; i < ghost.length; i++) {
+            if (ghost[i] != null) {
+                ghost[i] = new BlueFrightened(this);
+                ghost[i].setFrightened(true);
+            }
+        }
+    }
+
+    private void deactivatePowerMode() {
+        isPowerModeActive = false;
+        // ゴーストの状態を元に戻す
+        for (int i = 0; i < ghost.length; i++) {
+            if (ghost[i] != null) {
+                ghost[i].setFrightened(false);
+                ghost[i].setWarningMode(false);
+            }
+        }
+    }
+
+    // GameWindow クラス内
+    public void revertGhostFromFrightened(Entity frightenedGhost) {
+        // ghost 配列内から frightenedGhost と一致するオブジェクトを探す
+        for (int i = 0; i < ghost.length; i++) {
+            if (ghost[i] == frightenedGhost) {
+                Entity normalGhost = null;
+                // 各 frightened クラスに対応した通常状態のゴーストを生成
+                if (frightenedGhost instanceof entity.BlueFrightened || frightenedGhost instanceof entity.WhiteFrightened) {
+                    normalGhost = new entity.BlueGhost(this);
+                } else if (frightenedGhost instanceof entity.BlueFrightened || frightenedGhost instanceof entity.WhiteFrightened) {
+                    normalGhost = new entity.RedGhost(this);
+                } else if (frightenedGhost instanceof entity.BlueFrightened || frightenedGhost instanceof entity.WhiteFrightened) {
+                    normalGhost = new entity.OrangeGhost(this);
+                } else if (frightenedGhost instanceof entity.BlueFrightened || frightenedGhost instanceof entity.WhiteFrightened) {
+                    normalGhost = new entity.PinkGhost(this);
+                }
+
+                if (normalGhost != null) {
+                    normalGhost.x = frightenedGhost.x;
+                    normalGhost.y = frightenedGhost.y;
+                    normalGhost.speed = frightenedGhost.speed;
+                    normalGhost.spriteCounter = frightenedGhost.spriteCounter;
+                    normalGhost.spriteNum = frightenedGhost.spriteNum;
+
+                    ghost[i] = normalGhost;
+                }
+                break;
+            }
         }
     }
 
