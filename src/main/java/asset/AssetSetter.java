@@ -1,9 +1,6 @@
 package asset;
 
-import entity.BlueGhost;
-import entity.OrangeGhost;
-import entity.PinkGhost;
-import entity.RedGhost;
+import entity.*;
 import frame.FrameApp;
 import window.GameWindow;
 

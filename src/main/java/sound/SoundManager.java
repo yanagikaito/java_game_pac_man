@@ -43,6 +43,7 @@ public class SoundManager {
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundFile);
             backgroundClip = AudioSystem.getClip();
             backgroundClip.open(audioStream);
+            backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
             backgroundClip.start();
         } catch (Exception e) {
             e.printStackTrace();
