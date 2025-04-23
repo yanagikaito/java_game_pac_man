@@ -100,6 +100,9 @@ public class Entity {
     public boolean isWarning = false;
     public long frightenedStartTime = 0;
     public long frightenedDuration = 5000;
+    public boolean isInvisible = false;
+    public long invisibleStartTime = 0;
+    public long invisibleDuration = 0;
 
     public static final String[] DIRECTIONS = {"up", "down", "left", "right"};
 
@@ -109,13 +112,6 @@ public class Entity {
 
     public void setAction() {
 
-    }
-
-    // ゴーストをイジケモードに切り替える
-    public void activateFrightenedMode() {
-        isFrightened = true;
-        isWarning = false;
-        frightenedStartTime = System.currentTimeMillis();
     }
 
     // イジケモードの経過時間をチェックして、時間切れ・警告状態を更新
@@ -176,6 +172,12 @@ public class Entity {
     // 残り1秒の警告状態の設定（GameWindow などから呼び出す）
     public void setWarningMode(boolean warning) {
         isWarning = warning;
+    }
+
+    public void setInvisible(long duration) {
+        isInvisible = true;
+        invisibleStartTime = System.currentTimeMillis();
+        invisibleDuration = duration;
     }
 
     public void draw(Graphics2D g2) {

@@ -7,6 +7,7 @@ import window.GameWindow;
 public class CollisionChecker {
 
     private GameWindow gameWindow;
+    private boolean isGameStarted = false;
 
     public CollisionChecker(GameWindow gameWindow) {
         this.gameWindow = gameWindow;
@@ -117,6 +118,9 @@ public class CollisionChecker {
 
     public void checkPlayer(Entity entity) {
 
+        // ゲーム開始前なら衝突判定を無効化
+        if (!isGameStarted) return;
+
         entity.solidArea.x = entity.x + entity.solidArea.x;
         entity.solidArea.y = entity.y + entity.solidArea.y;
 
@@ -124,43 +128,24 @@ public class CollisionChecker {
         gameWindow.getPlayer().solidArea.y = gameWindow.getPlayer().y + gameWindow.getPlayer().solidArea.y;
 
         switch (entity.direction) {
-            case "up" -> {
-                entity.solidArea.y -= entity.speed;
-                if (entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
-                    entity.collision = true;
-                    gameWindow.setGameState(gameWindow.getGameOverState());
-                    gameWindow.getGameOver().triggerGameOver();
-                    gameWindow.getGameOver().update();
-                }
-            }
-            case "down" -> {
-                entity.solidArea.y += entity.speed;
-                if (entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
-                    entity.collision = true;
-                    gameWindow.setGameState(gameWindow.getGameOverState());
-                    gameWindow.getGameOver().triggerGameOver();
-                    gameWindow.getGameOver().update();
-                }
-            }
-            case "left" -> {
-                entity.solidArea.x -= entity.speed;
-                if (entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
-                    entity.collision = true;
-                    gameWindow.setGameState(gameWindow.getGameOverState());
-                    gameWindow.getGameOver().triggerGameOver();
-                    gameWindow.getGameOver().update();
-                }
-            }
-            case "right" -> {
-                entity.solidArea.x += entity.speed;
-                if (entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
-                    entity.collision = true;
-                    gameWindow.setGameState(gameWindow.getGameOverState());
-                    gameWindow.getGameOver().triggerGameOver();
-                    gameWindow.getGameOver().update();
-                }
+            case "up" -> entity.solidArea.y -= entity.speed;
+            case "down" -> entity.solidArea.y += entity.speed;
+            case "left" -> entity.solidArea.x -= entity.speed;
+            case "right" -> entity.solidArea.x += entity.speed;
+        }
+
+        // 衝突判定
+        if (entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
+            entity.collision = true;
+            if (entity.isFrightened) {
+                gameWindow.eatGhost(entity);
+            } else {
+                gameWindow.setGameState(gameWindow.getGameOverState());
+                gameWindow.getGameOver().triggerGameOver();
+                gameWindow.getGameOver().update();
             }
         }
+
         entity.solidArea.x = entity.solidAreaDefaultX;
         entity.solidArea.y = entity.solidAreaDefaultY;
         gameWindow.getPlayer().solidArea.x = gameWindow.getPlayer().solidAreaDefaultX;

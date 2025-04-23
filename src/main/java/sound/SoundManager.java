@@ -37,6 +37,10 @@ public class SoundManager {
         }
     }
 
+    public void playEatGhostWAV(String filePath) {
+        playWAV(filePath);
+    }
+
     public void playBackgroundWAV(String filePath) {
         try {
             File soundFile = new File(filePath);

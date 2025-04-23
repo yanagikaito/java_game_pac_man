@@ -25,8 +25,8 @@ public class Player extends Entity {
         solidArea = new Rectangle();
         solidArea.x = 0;
         solidArea.y = 0;
-        solidArea.width = FrameApp.createSize() - 4;
-        solidArea.height = FrameApp.createSize() - 4;
+        solidArea.width = FrameApp.createSize() - 6;
+        solidArea.height = FrameApp.createSize() - 6;
 
         setDefaultValues();
         loadPlayerImages();
