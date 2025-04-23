@@ -18,10 +18,12 @@ public class BlueFrightened extends Entity {
     // フライトモード用のタイマー
     private long frightenedStartTime;
     private final long frightenedDuration = 5000;
+    private Class<?> originalGhostType;
 
-    public BlueFrightened(GameWindow gameWindow) {
+    public BlueFrightened(GameWindow gameWindow, Class<?> originalType) {
         super(gameWindow);
         this.gameWindow = gameWindow;
+        this.originalGhostType = originalType;
         // 初期状態は右向き、速度は通常と同様（必要に応じて変更）
         direction = "right";
         speed = 2;
@@ -145,5 +147,9 @@ public class BlueFrightened extends Entity {
         if (image != null) {
             g2.drawImage(image, x, y, FrameApp.createSize(), FrameApp.createSize(), null);
         }
+    }
+
+    public Class<?> getOriginalGhostType() {
+        return originalGhostType;
     }
 }

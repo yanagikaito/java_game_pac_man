@@ -23,6 +23,7 @@ public class GameWindow extends JPanel implements Window, Runnable {
     private KeyHandler keyHandler = new KeyHandler(this);
     private Player player = new Player(this, keyHandler);
     private Entity[] ghost = new Entity[4];
+    private Entity[] frightenedGhost = new Entity[4];
     private TileManager tileManager = new TileManager(this);
     private AssetSetter assetSetter = new AssetSetter(this);
     private GameOver gameOver = new GameOver(this);
@@ -183,11 +184,18 @@ public class GameWindow extends JPanel implements Window, Runnable {
         isPowerModeActive = true;
         powerModeStartTime = System.currentTimeMillis();
 
-        // ゴーストを全てイジケモードへ
         for (int i = 0; i < ghost.length; i++) {
             if (ghost[i] != null) {
-                ghost[i] = new BlueFrightened(this);
-                ghost[i].setFrightened(true);
+                int ghostX = ghost[i].x;
+                int ghostY = ghost[i].y;
+                Class<?> originalType = ghost[i].getClass();
+
+                // すべてのゴーストを BlueFrightened に変更
+                frightenedGhost[i] = new BlueFrightened(this, originalType);
+                frightenedGhost[i].x = ghostX;
+                frightenedGhost[i].y = ghostY;
+
+                ghost[i] = frightenedGhost[i];
             }
         }
     }
@@ -203,34 +211,50 @@ public class GameWindow extends JPanel implements Window, Runnable {
         }
     }
 
-    // GameWindow クラス内
     public void revertGhostFromFrightened(Entity frightenedGhost) {
-        // ghost 配列内から frightenedGhost と一致するオブジェクトを探す
         for (int i = 0; i < ghost.length; i++) {
             if (ghost[i] == frightenedGhost) {
                 Entity normalGhost = null;
-                // 各 frightened クラスに対応した通常状態のゴーストを生成
-                if (frightenedGhost instanceof entity.BlueFrightened || frightenedGhost instanceof entity.WhiteFrightened) {
-                    normalGhost = new entity.BlueGhost(this);
-                } else if (frightenedGhost instanceof entity.BlueFrightened || frightenedGhost instanceof entity.WhiteFrightened) {
-                    normalGhost = new entity.RedGhost(this);
-                } else if (frightenedGhost instanceof entity.BlueFrightened || frightenedGhost instanceof entity.WhiteFrightened) {
-                    normalGhost = new entity.OrangeGhost(this);
-                } else if (frightenedGhost instanceof entity.BlueFrightened || frightenedGhost instanceof entity.WhiteFrightened) {
-                    normalGhost = new entity.PinkGhost(this);
+                Class<?> originalType = ((BlueFrightened) frightenedGhost).getOriginalGhostType();
+
+                // 元のゴーストへ戻す
+                if (originalType == RedGhost.class) {
+                    normalGhost = new RedGhost(this);
+                } else if (originalType == BlueGhost.class) {
+                    normalGhost = new BlueGhost(this);
+                } else if (originalType == OrangeGhost.class) {
+                    normalGhost = new OrangeGhost(this);
+                } else if (originalType == PinkGhost.class) {
+                    normalGhost = new PinkGhost(this);
                 }
 
                 if (normalGhost != null) {
                     normalGhost.x = frightenedGhost.x;
                     normalGhost.y = frightenedGhost.y;
                     normalGhost.speed = frightenedGhost.speed;
-                    normalGhost.spriteCounter = frightenedGhost.spriteCounter;
-                    normalGhost.spriteNum = frightenedGhost.spriteNum;
 
                     ghost[i] = normalGhost;
                 }
                 break;
             }
+        }
+    }
+
+    public void eatGhost(Entity ghost) {
+        if (ghost != null) {
+            // スコアを加算（ゴーストを食べた時の得点）
+            score += 200;
+            soundManager.playEatGhostWAV("res/sound/eat-ghost-sound.wav"); // ゴーストを食べた時のサウンドを再生
+
+            // ゴーストを一時的に非表示にする（例えば3秒間）
+            ghost.setInvisible(3000);
+
+            // ゴーストを基地の位置に戻す（リスポーン）
+            ghost.x = FrameApp.createSize() * 9;
+            ghost.y = FrameApp.createSize() * 8;
+
+            // ゴーストを通常状態に戻す
+            ghost.setFrightened(false);
         }
     }
 
@@ -305,5 +329,9 @@ public class GameWindow extends JPanel implements Window, Runnable {
 
     public UI getUi() {
         return ui;
+    }
+
+    public Entity[] getFrightenedGhost() {
+        return frightenedGhost;
     }
 }
