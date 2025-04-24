@@ -96,6 +96,10 @@ public class PinkGhost extends Entity {
         }
         if (image != null) {
             g2.drawImage(image, x, y, FrameApp.createSize(), FrameApp.createSize(), null);
+
+            // デバッグ
+            g2.setColor(Color.GREEN);
+            g2.drawRect(x + solidArea.x, y + solidArea.y, solidArea.width, solidArea.height);
         }
     }
 }
