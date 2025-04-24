@@ -87,10 +87,10 @@ public class Entity {
     public int spriteCounter = 0;
     public int spriteNum = 1;
 
-    public int width = 28;
-    public int height = 28;
-    public int entityX = 0;
-    public int entityY = 0;
+    public int width = 30;
+    public int height = 30;
+    public int entityX = 1;
+    public int entityY = 1;
     public int solidAreaDefaultX;
     public int solidAreaDefaultY;
     public Rectangle solidArea = new Rectangle(entityX, entityY, width, height);
@@ -217,6 +217,10 @@ public class Entity {
 
         if (image != null) {
             g2.drawImage(image, x, y, FrameApp.createSize(), FrameApp.createSize(), null);
+
+            // デバッグ
+            g2.setColor(Color.GREEN);
+            g2.drawRect(x + solidArea.x, y + solidArea.y, solidArea.width, solidArea.height);
         }
     }
 }

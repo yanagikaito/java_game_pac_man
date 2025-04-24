@@ -16,6 +16,8 @@ public class Player extends Entity {
 
     private GameWindow gameWindow;
     private KeyHandler keyHandler;
+    private boolean moving = false;
+    private int pixelCounter = 0;
 
     public Player(GameWindow gameWindow, KeyHandler keyHandler) {
         super(gameWindow);
@@ -23,10 +25,10 @@ public class Player extends Entity {
         this.keyHandler = keyHandler;
 
         solidArea = new Rectangle();
-        solidArea.x = 0;
-        solidArea.y = 0;
-        solidArea.width = FrameApp.createSize() - 6;
-        solidArea.height = FrameApp.createSize() - 6;
+        solidArea.x = 1;
+        solidArea.y = 1;
+        solidArea.width = FrameApp.createSize() - 2;
+        solidArea.height = FrameApp.createSize() - 2;
 
         setDefaultValues();
         loadPlayerImages();
@@ -53,23 +55,31 @@ public class Player extends Entity {
     }
 
     public void update() {
-        if (keyHandler.pacmanUp || keyHandler.pacmanDown || keyHandler.pacmanLeft || keyHandler.pacmanRight) {
 
-            if (keyHandler.pacmanUp) {
-                direction = "up";
-            } else if (keyHandler.pacmanDown) {
-                direction = "down";
-            } else if (keyHandler.pacmanRight) {
-                direction = "right";
-            } else if (keyHandler.pacmanLeft) {
-                direction = "left";
+        if (moving == false) {
+
+            if (keyHandler.pacmanUp || keyHandler.pacmanDown || keyHandler.pacmanLeft || keyHandler.pacmanRight) {
+
+                if (keyHandler.pacmanUp) {
+                    direction = "up";
+                } else if (keyHandler.pacmanDown) {
+                    direction = "down";
+                } else if (keyHandler.pacmanRight) {
+                    direction = "right";
+                } else if (keyHandler.pacmanLeft) {
+                    direction = "left";
+                }
+
+                moving = true;
+
+                collision = false;
+                gameWindow.getCollisionChecker().checkTile(this);
+
+                int ghostIndex = gameWindow.getCollisionChecker().checkEntity(this, gameWindow.getGhost());
+                interactGHOST(ghostIndex);
             }
-
-            collision = false;
-            gameWindow.getCollisionChecker().checkTile(this);
-
-            int ghostIndex = gameWindow.getCollisionChecker().checkEntity(this, gameWindow.getGhost());
-            interactGHOST(ghostIndex);
+        }
+        if (moving == true) {
 
             if (collision == false) {
 
@@ -85,6 +95,12 @@ public class Player extends Entity {
             if (spriteCounter > 10) {
                 spriteNum = (spriteNum % SPRITE_COUNT) + 1;
                 spriteCounter = 0;
+            }
+            pixelCounter += speed;
+
+            if (pixelCounter == FrameApp.createSize()) {
+                moving = false;
+                pixelCounter = 0;
             }
         }
     }
@@ -107,5 +123,9 @@ public class Player extends Entity {
             image = sprites[dirIndex][spriteNum - 1];
         }
         g2.drawImage(image, x, y, FrameApp.createSize(), FrameApp.createSize(), null);
+
+        // デバッグ
+        g2.setColor(Color.RED);
+        g2.drawRect(x + solidArea.x, y + solidArea.y, solidArea.width, solidArea.height);
     }
 }
