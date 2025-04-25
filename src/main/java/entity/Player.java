@@ -125,7 +125,7 @@ public class Player extends Entity {
         g2.drawImage(image, x, y, FrameApp.createSize(), FrameApp.createSize(), null);
 
         // デバッグ
-        g2.setColor(Color.RED);
-        g2.drawRect(x + solidArea.x, y + solidArea.y, solidArea.width, solidArea.height);
+//        g2.setColor(Color.RED);
+//        g2.drawRect(x + solidArea.x, y + solidArea.y, solidArea.width, solidArea.height);
     }
 }
