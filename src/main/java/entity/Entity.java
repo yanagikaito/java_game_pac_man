@@ -183,7 +183,6 @@ public class Entity {
     public void draw(Graphics2D g2) {
         BufferedImage image = null;
 
-        // 通常状態の場合は例えば赤いゴースト画像を使用（元々の実装）
         switch (direction) {
             case "up" -> {
                 if (spriteNum == 1) {
@@ -219,8 +218,8 @@ public class Entity {
             g2.drawImage(image, x, y, FrameApp.createSize(), FrameApp.createSize(), null);
 
             // デバッグ
-            g2.setColor(Color.GREEN);
-            g2.drawRect(x + solidArea.x, y + solidArea.y, solidArea.width, solidArea.height);
+//            g2.setColor(Color.GREEN);
+//            g2.drawRect(x + solidArea.x, y + solidArea.y, solidArea.width, solidArea.height);
         }
     }
 }

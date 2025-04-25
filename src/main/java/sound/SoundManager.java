@@ -37,6 +37,10 @@ public class SoundManager {
         }
     }
 
+    public void playFrightenedWAV(String filePath) {
+        playWAV(filePath);
+    }
+
     public void playEatGhostWAV(String filePath) {
         playWAV(filePath);
     }
