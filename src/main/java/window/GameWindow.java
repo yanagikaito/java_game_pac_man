@@ -10,10 +10,13 @@ import game.GameOver;
 import key.KeyHandler;
 import sound.SoundManager;
 import tile.TileManager;
+import ui.ScorePopup;
 import ui.UI;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
+import java.util.ArrayList;
 
 import static frame.FrameApp.baseDisplay;
 
@@ -32,9 +35,11 @@ public class GameWindow extends JPanel implements Window, Runnable {
     private CollisionChecker collisionChecker = new CollisionChecker(this);
     private SoundManager soundManager = new SoundManager(this);
     private UI ui = new UI(this);
+    private List<ScorePopup> scorePopups = new ArrayList<>();
     private boolean isPlayBackgroundMusic = false;
     private boolean isStartBGMPlaying = false;
     private boolean isPowerModeActive = false;
+    private boolean isPlayFrightenedMusic = false;
     private long powerModeStartTime = 0;
     private final long powerModeDuration = 5000;
     private int gameState;
@@ -130,6 +135,9 @@ public class GameWindow extends JPanel implements Window, Runnable {
         }
         if (gameState == playState) {
             player.update();
+
+            scorePopups.removeIf(ScorePopup::isExpired);
+
             if (!isPlayBackgroundMusic) {
                 soundManager.playBackgroundWAV("res/sound/game-background-sound.wav");
                 isPlayBackgroundMusic = true;
@@ -148,7 +156,7 @@ public class GameWindow extends JPanel implements Window, Runnable {
 
                 activatePowerMode();
             }
-            // パワーモード中の効果時間チェック
+
             if (isPowerModeActive) {
                 long elapsed = System.currentTimeMillis() - powerModeStartTime;
                 if (elapsed >= powerModeDuration) {
@@ -160,7 +168,7 @@ public class GameWindow extends JPanel implements Window, Runnable {
                         }
                     }
                 } else {
-                    // 警告状態でなければ解除
+
                     for (int i = 0; i < ghost.length; i++) {
                         if (ghost[i] != null) {
                             ghost[i].setWarningMode(false);
@@ -184,14 +192,19 @@ public class GameWindow extends JPanel implements Window, Runnable {
         isPowerModeActive = true;
         powerModeStartTime = System.currentTimeMillis();
 
+        if (!isPlayFrightenedMusic) {
+            soundManager.playFrightenedWAV("res/sound/frightened-sound.wav");
+            isPlayFrightenedMusic = true;
+        }
+
         for (int i = 0; i < ghost.length; i++) {
             if (ghost[i] != null) {
                 int ghostX = ghost[i].x;
                 int ghostY = ghost[i].y;
                 Class<?> originalType = ghost[i].getClass();
 
-                // すべてのゴーストを BlueFrightened に変更
                 frightenedGhost[i] = new BlueFrightened(this, originalType);
+                frightenedGhost[i].setFrightened(true);
                 frightenedGhost[i].x = ghostX;
                 frightenedGhost[i].y = ghostY;
 
@@ -202,7 +215,6 @@ public class GameWindow extends JPanel implements Window, Runnable {
 
     private void deactivatePowerMode() {
         isPowerModeActive = false;
-        // ゴーストの状態を元に戻す
         for (int i = 0; i < ghost.length; i++) {
             if (ghost[i] != null) {
                 ghost[i].setFrightened(false);
@@ -217,7 +229,6 @@ public class GameWindow extends JPanel implements Window, Runnable {
                 Entity normalGhost = null;
                 Class<?> originalType = ((BlueFrightened) frightenedGhost).getOriginalGhostType();
 
-                // 元のゴーストへ戻す
                 if (originalType == RedGhost.class) {
                     normalGhost = new RedGhost(this);
                 } else if (originalType == BlueGhost.class) {
@@ -235,25 +246,22 @@ public class GameWindow extends JPanel implements Window, Runnable {
 
                     ghost[i] = normalGhost;
                 }
-                break;
             }
         }
     }
 
     public void eatGhost(Entity ghost) {
         if (ghost != null) {
-            // スコアを加算（ゴーストを食べた時の得点）
             score += 200;
-            soundManager.playEatGhostWAV("res/sound/eat-ghost-sound.wav"); // ゴーストを食べた時のサウンドを再生
+            soundManager.playEatGhostWAV("res/sound/eat-ghost-sound.wav");
 
-            // ゴーストを一時的に非表示にする（例えば3秒間）
+            addScorePopup(ghost.x, ghost.y, 200);
+
             ghost.setInvisible(3000);
 
-            // ゴーストを基地の位置に戻す（リスポーン）
             ghost.x = FrameApp.createSize() * 9;
             ghost.y = FrameApp.createSize() * 8;
 
-            // ゴーストを通常状態に戻す
             ghost.setFrightened(false);
         }
     }
@@ -271,6 +279,10 @@ public class GameWindow extends JPanel implements Window, Runnable {
                 if (ghostEntity != null) {
                     ghostEntity.draw(g2);
                 }
+            }
+
+            for (ScorePopup popup : scorePopups) {
+                popup.draw(g2);
             }
 
             g2.setColor(Color.WHITE);
@@ -331,7 +343,7 @@ public class GameWindow extends JPanel implements Window, Runnable {
         return ui;
     }
 
-    public Entity[] getFrightenedGhost() {
-        return frightenedGhost;
+    public void addScorePopup(int x, int y, int scoreValue) {
+        scorePopups.add(new ScorePopup(this, x, y, scoreValue));
     }
 }

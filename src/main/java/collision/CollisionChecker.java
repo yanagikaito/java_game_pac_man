@@ -7,7 +7,6 @@ import window.GameWindow;
 public class CollisionChecker {
 
     private GameWindow gameWindow;
-    private boolean isGameStarted = false;
 
     public CollisionChecker(GameWindow gameWindow) {
         this.gameWindow = gameWindow;
@@ -118,9 +117,6 @@ public class CollisionChecker {
 
     public void checkPlayer(Entity entity) {
 
-        // ゲーム開始前なら衝突判定を無効化
-        if (!isGameStarted) return;
-
         entity.solidArea.x = entity.x + entity.solidArea.x;
         entity.solidArea.y = entity.y + entity.solidArea.y;
 
@@ -137,7 +133,7 @@ public class CollisionChecker {
         // 衝突判定
         if (entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
             entity.collision = true;
-            if (entity.isFrightened) {
+            if (entity.isFrightened == true) {
                 gameWindow.eatGhost(entity);
             } else {
                 gameWindow.setGameState(gameWindow.getGameOverState());
