@@ -133,7 +133,7 @@ public class CollisionChecker {
         // 衝突判定
         if (entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
             entity.collision = true;
-            if (entity.isFrightened == true) {
+            if (entity.isFrightened == true || entity.isWarning == true) {
                 gameWindow.eatGhost(entity);
             } else {
                 gameWindow.setGameState(gameWindow.getGameOverState());
