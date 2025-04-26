@@ -1,5 +1,6 @@
 package window;
 
+import ai.PathFinder;
 import asset.AssetSetter;
 import collision.CollisionChecker;
 import entity.*;
@@ -35,6 +36,7 @@ public class GameWindow extends JPanel implements Window, Runnable {
     private CollisionChecker collisionChecker = new CollisionChecker(this);
     private SoundManager soundManager = new SoundManager(this);
     private UI ui = new UI(this);
+    private PathFinder pathFinder = new PathFinder(this);
     private List<ScorePopup> scorePopups = new ArrayList<>();
     private boolean isPlayBackgroundMusic = false;
     private boolean isStartBGMPlaying = false;
@@ -256,13 +258,26 @@ public class GameWindow extends JPanel implements Window, Runnable {
             soundManager.playEatGhostWAV("res/sound/eat-ghost-sound.wav");
 
             addScorePopup(ghost.x, ghost.y, 200);
-
-            ghost.setInvisible(3000);
+            ghost.setInvisible(1000);
+            ghost.setFrightened(false);
 
             ghost.x = FrameApp.createSize() * 9;
             ghost.y = FrameApp.createSize() * 8;
 
-            ghost.setFrightened(false);
+            ghost.isReturning = true;
+
+            for (int i = 0; i < this.ghost.length; i++) {
+                if (this.ghost[i] == ghost) {
+                    GhostEye ghostEye = new GhostEye(this);
+                    ghostEye.x = ghost.x;
+                    ghostEye.y = ghost.y;
+                    ghostEye.speed = ghost.speed;
+                    ghostEye.searchPath(9, 8);
+                    ghostEye.isReturning = true;
+                    this.ghost[i] = ghostEye;
+                    break;
+                }
+            }
         }
     }
 
@@ -345,5 +360,9 @@ public class GameWindow extends JPanel implements Window, Runnable {
 
     public void addScorePopup(int x, int y, int scoreValue) {
         scorePopups.add(new ScorePopup(this, x, y, scoreValue));
+    }
+
+    public PathFinder getPathFinder() {
+        return pathFinder;
     }
 }

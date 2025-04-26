@@ -79,6 +79,12 @@ public class Entity {
     public BufferedImage white_frightened_right1;
     public BufferedImage white_frightened_right2;
 
+    // eye
+    public BufferedImage ghost_eye_up;
+    public BufferedImage ghost_eye_down;
+    public BufferedImage ghost_eye_left;
+    public BufferedImage ghost_eye_right;
+
     // 方向とスプライトの配列
     // 4方向 × 3スプライト
     public BufferedImage[][] sprites = new BufferedImage[4][3];
@@ -104,6 +110,11 @@ public class Entity {
     public long invisibleStartTime = 0;
     public long invisibleDuration = 0;
 
+    public boolean isReturning = false;
+
+    public final int baseCol = FrameApp.createSize() * 9;
+    public final int baseRow = FrameApp.createSize() * 8;
+
     public static final String[] DIRECTIONS = {"up", "down", "left", "right"};
 
     public Entity(GameWindow gameWindow) {
@@ -118,7 +129,7 @@ public class Entity {
     public void updateFrightenedMode() {
         if (isFrightened) {
             long elapsed = System.currentTimeMillis() - frightenedStartTime;
-            if (elapsed >= frightenedDuration) {
+            if (elapsed >= frightenedDuration + 100) {
                 isFrightened = false;
                 isWarning = false;
             } else if (frightenedDuration - elapsed <= 1000) { // 残り1秒なら警告状態
@@ -160,9 +171,15 @@ public class Entity {
         }
     }
 
+    // 基地に到着した時に通常状態に戻す処理
+    public void revertToNormalState() {
+        setFrightened(false);
+    }
+
     // 外部から呼び出してフライト状態に切り替える
     public void setFrightened(boolean frightened) {
         isFrightened = frightened;
+        System.out.println("isFrightened = " + isFrightened);
         if (frightened) {
 
             frightenedStartTime = System.currentTimeMillis();
@@ -180,7 +197,68 @@ public class Entity {
         invisibleDuration = duration;
     }
 
+    public void searchPath(int goalCol, int goalRow) {
+
+        int startCol = (x + solidArea.x) / FrameApp.createSize();
+        int startRow = (y + solidArea.y) / FrameApp.createSize();
+
+        gameWindow.getPathFinder().setNodes(startCol, startRow, goalCol, goalRow, this);
+
+        gameWindow.getPathFinder().findPath();
+
+        if (gameWindow.getPathFinder().isPathFound()) {
+
+            int nextX = gameWindow.getPathFinder().getPathPoints().get(0).x * FrameApp.createSize();
+            int nextY = gameWindow.getPathFinder().getPathPoints().get(0).y * FrameApp.createSize();
+
+            int enLeftX = x + solidArea.x;
+            int enRightX = x + solidArea.x + solidArea.width;
+            int enTopY = y + solidArea.y;
+            int enBottomY = y + solidArea.y + solidArea.height;
+
+            if (enTopY > nextY && enLeftX >= nextX && enRightX < nextX + FrameApp.createSize()) {
+                direction = "up";
+            } else if (enTopY < nextY && enLeftX >= nextX && enRightX < nextX + FrameApp.createSize()) {
+                direction = "down";
+            } else if (enTopY >= nextY && enBottomY < nextY + FrameApp.createSize()) {
+                if (enLeftX > nextX) {
+                    direction = "left";
+                }
+                if (enLeftX < nextX) {
+                    direction = "right";
+                }
+            } else if (enTopY > nextY && enLeftX > nextX) {
+                direction = "up";
+                if (collision == true) {
+                    direction = "left";
+                }
+            } else if (enTopY > nextY && enLeftX < nextX) {
+                direction = "up";
+                if (collision == true) {
+                    direction = "right";
+                }
+            } else if (enTopY < nextY && enLeftX > nextX) {
+                direction = "down";
+                if (collision == true) {
+                    direction = "left";
+                }
+            } else if (enTopY < nextY && enLeftX < nextX) {
+                direction = "down";
+                if (collision == true) {
+                    direction = "right";
+                }
+            }
+
+            int nextCol = gameWindow.getPathFinder().getPathPoints().get(0).x;
+            int nextRow = gameWindow.getPathFinder().getPathPoints().get(0).y;
+            if (nextCol == goalCol && nextRow == goalRow) {
+                isReturning = false;
+            }
+        }
+    }
+
     public void draw(Graphics2D g2) {
+
         BufferedImage image = null;
 
         switch (direction) {
@@ -221,5 +299,9 @@ public class Entity {
 //            g2.setColor(Color.GREEN);
 //            g2.drawRect(x + solidArea.x, y + solidArea.y, solidArea.width, solidArea.height);
         }
+    }
+
+    public boolean getIsReturning() {
+        return isReturning;
     }
 }
