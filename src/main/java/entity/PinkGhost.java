@@ -17,6 +17,7 @@ public class PinkGhost extends Entity {
 
     public PinkGhost(GameWindow gameWindow) {
         super(gameWindow);
+        this.originalGhostType = PinkGhost.class;
         direction = "right";
         speed = 2;
         loadGhostImages();

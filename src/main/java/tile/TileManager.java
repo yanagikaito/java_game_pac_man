@@ -21,7 +21,7 @@ public class TileManager {
         tile = new Tile[4];
         mapTileNum = new int[FrameApp.getScreenWidth()][FrameApp.getScreenHeight()];
         getTileImage();
-        loadMap("map/map.text.txt");
+        loadMap("map/map.text.txt", 0);
     }
 
     public void getTileImage() {
@@ -43,7 +43,7 @@ public class TileManager {
         }
     }
 
-    public void loadMap(String filePath) {
+    public void loadMap(String filePath, int map) {
 
         try {
 

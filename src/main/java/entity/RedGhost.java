@@ -14,6 +14,7 @@ public class RedGhost extends Entity {
 
     public RedGhost(GameWindow gameWindow) {
         super(gameWindow);
+        this.originalGhostType = RedGhost.class;
         direction = "right";
         speed = 2;
         loadGhostImages();

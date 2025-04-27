@@ -64,6 +64,21 @@ public class PathFinder {
     }
 
     public void setNodes(int startCol, int startRow, int goalCol, int goalRow, Entity entity) {
+        // マップの最大セル数を取得（例: 22）
+        int maxCols = FrameApp.getMaxScreenCol();
+        int maxRows = FrameApp.getMaxScreenRow();
+
+        // クランプ処理
+        if (startCol < 0) startCol = 0;
+        if (startCol >= maxCols) startCol = maxCols - 1;
+        if (startRow < 0) startRow = 0;
+        if (startRow >= maxRows) startRow = maxRows - 1;
+
+        if (goalCol < 0) goalCol = 0;
+        if (goalCol >= maxCols) goalCol = maxCols - 1;
+        if (goalRow < 0) goalRow = 0;
+        if (goalRow >= maxRows) goalRow = maxRows - 1;
+
         resetNodes();
 
         startNode = node[startCol][startRow];
@@ -73,20 +88,17 @@ public class PathFinder {
         goalNode = node[goalCol][goalRow];
         openList.add(currentNode);
 
-        int col = 0;
-        int row = 0;
-        while (col < FrameApp.getMaxScreenCol() && row < FrameApp.getMaxScreenRow()) {
-            int tileNum = gameWindow.getTileManager().mapTileNum[col][row];
-            if (gameWindow.getTileManager().tile[tileNum].collision) {
-                node[col][row].solid = true;
-            }
-            col++;
-            if (col == FrameApp.getMaxScreenCol()) {
-                col = 0;
-                row++;
+        // 全マップの走査（2重ループの方が読みやすい）
+        for (int row = 0; row < maxRows; row++) {
+            for (int col = 0; col < maxCols; col++) {
+                int tileNum = gameWindow.getTileManager().mapTileNum[col][row];
+                if (gameWindow.getTileManager().tile[tileNum].collision || tileNum == 2) {
+                    node[col][row].solid = true;
+                }
             }
         }
     }
+
 
     public void findPath() {
         while (!openList.isEmpty() && !goalReached) {
@@ -173,5 +185,9 @@ public class PathFinder {
     // 経路探索が完了しているかどうか
     public boolean isPathFound() {
         return goalReached;
+    }
+
+    public ArrayList<Node> getPathList() {
+        return pathList;
     }
 }

@@ -11,9 +11,12 @@ import java.io.IOException;
 public class GhostEye extends Entity {
 
     private GameWindow gameWindow;
+    private Class<?> originalGhostEyeType;
 
-    public GhostEye(GameWindow gameWindow) {
+    public GhostEye(GameWindow gameWindow, Class<?> originalGhostEyeType) {
         super(gameWindow);
+        this.gameWindow = gameWindow;
+        this.originalGhostEyeType = originalGhostEyeType;
         direction = "right";
         speed = 2;
         loadGhostImages();
@@ -37,12 +40,14 @@ public class GhostEye extends Entity {
     public void setAction() {
         if (isReturning == true) {
 
+            searchPath(BASE_COL,BASE_ROW);
+
             int currentCol = (x + solidArea.x) / FrameApp.createSize();
             int currentRow = (y + solidArea.y) / FrameApp.createSize();
 
-            if (currentCol == baseCol && currentRow == baseRow) {
+            if (currentCol == BASE_COL && currentRow == BASE_ROW) {
                 isReturning = false;
-                revertToNormalState();
+                gameWindow.revertGhostFromGhostEye(this);
             }
         }
     }
@@ -72,5 +77,9 @@ public class GhostEye extends Entity {
                 g2.drawImage(eyeImage, x, y, FrameApp.createSize(), FrameApp.createSize(), null);
             }
         }
+    }
+
+    public Class<?> getOriginalGhostEyeType() {
+        return originalGhostEyeType;
     }
 }
