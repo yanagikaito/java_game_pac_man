@@ -109,11 +109,12 @@ public class Entity {
     public boolean isInvisible = false;
     public long invisibleStartTime = 0;
     public long invisibleDuration = 0;
-
     public boolean isReturning = false;
 
-    public final int baseCol = FrameApp.createSize() * 9;
-    public final int baseRow = FrameApp.createSize() * 8;
+    protected Class<?> originalGhostType;
+
+    public static final int BASE_COL = 9;
+    public static final int BASE_ROW = 8;
 
     public static final String[] DIRECTIONS = {"up", "down", "left", "right"};
 
@@ -140,15 +141,19 @@ public class Entity {
         }
     }
 
+    public void checkCollision() {
+
+        collision = false;
+        gameWindow.getCollisionChecker().checkTile(this);
+        gameWindow.getCollisionChecker().checkPlayer(this);
+    }
+
     public void update() {
 
         updateFrightenedMode();
 
         setAction();
-
-        collision = false;
-        gameWindow.getCollisionChecker().checkTile(this);
-        gameWindow.getCollisionChecker().checkPlayer(this);
+        checkCollision();
 
         if (collision == false) {
 
@@ -169,11 +174,6 @@ public class Entity {
             }
             spriteCounter = 0;
         }
-    }
-
-    // 基地に到着した時に通常状態に戻す処理
-    public void revertToNormalState() {
-        setFrightened(false);
     }
 
     // 外部から呼び出してフライト状態に切り替える
@@ -203,13 +203,12 @@ public class Entity {
         int startRow = (y + solidArea.y) / FrameApp.createSize();
 
         gameWindow.getPathFinder().setNodes(startCol, startRow, goalCol, goalRow, this);
-
         gameWindow.getPathFinder().findPath();
 
         if (gameWindow.getPathFinder().isPathFound()) {
 
-            int nextX = gameWindow.getPathFinder().getPathPoints().get(0).x * FrameApp.createSize();
-            int nextY = gameWindow.getPathFinder().getPathPoints().get(0).y * FrameApp.createSize();
+            int nextX = gameWindow.getPathFinder().getPathList().getFirst().col * FrameApp.createSize();
+            int nextY = gameWindow.getPathFinder().getPathList().getFirst().row * FrameApp.createSize();
 
             int enLeftX = x + solidArea.x;
             int enRightX = x + solidArea.x + solidArea.width;
@@ -229,33 +228,38 @@ public class Entity {
                 }
             } else if (enTopY > nextY && enLeftX > nextX) {
                 direction = "up";
+                checkCollision();
                 if (collision == true) {
                     direction = "left";
                 }
             } else if (enTopY > nextY && enLeftX < nextX) {
                 direction = "up";
+                checkCollision();
                 if (collision == true) {
                     direction = "right";
                 }
             } else if (enTopY < nextY && enLeftX > nextX) {
                 direction = "down";
+                checkCollision();
                 if (collision == true) {
                     direction = "left";
                 }
             } else if (enTopY < nextY && enLeftX < nextX) {
                 direction = "down";
+                checkCollision();
                 if (collision == true) {
                     direction = "right";
                 }
             }
 
-            int nextCol = gameWindow.getPathFinder().getPathPoints().get(0).x;
-            int nextRow = gameWindow.getPathFinder().getPathPoints().get(0).y;
+            int nextCol = gameWindow.getPathFinder().getPathList().getFirst().col;
+            int nextRow = gameWindow.getPathFinder().getPathList().getFirst().row;
             if (nextCol == goalCol && nextRow == goalRow) {
                 isReturning = false;
             }
         }
     }
+
 
     public void draw(Graphics2D g2) {
 
@@ -303,5 +307,9 @@ public class Entity {
 
     public boolean getIsReturning() {
         return isReturning;
+    }
+
+    public Class<?> getOriginalGhostType() {
+        return originalGhostType;
     }
 }

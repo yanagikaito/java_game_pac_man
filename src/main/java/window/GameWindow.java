@@ -10,6 +10,7 @@ import frame.GameFrame;
 import game.GameOver;
 import key.KeyHandler;
 import sound.SoundManager;
+import tile.Tile;
 import tile.TileManager;
 import ui.ScorePopup;
 import ui.UI;
@@ -38,6 +39,8 @@ public class GameWindow extends JPanel implements Window, Runnable {
     private UI ui = new UI(this);
     private PathFinder pathFinder = new PathFinder(this);
     private List<ScorePopup> scorePopups = new ArrayList<>();
+    private final int maxMap = 10;
+    private int currentMap = 0;
     private boolean isPlayBackgroundMusic = false;
     private boolean isStartBGMPlaying = false;
     private boolean isPowerModeActive = false;
@@ -261,21 +264,49 @@ public class GameWindow extends JPanel implements Window, Runnable {
             ghost.setInvisible(1000);
             ghost.setFrightened(false);
 
-            ghost.x = FrameApp.createSize() * 9;
-            ghost.y = FrameApp.createSize() * 8;
-
             ghost.isReturning = true;
 
             for (int i = 0; i < this.ghost.length; i++) {
                 if (this.ghost[i] == ghost) {
-                    GhostEye ghostEye = new GhostEye(this);
+                    Class<?> originalType = ((Entity) ghost).getOriginalGhostType();
+                    // GhostEye のコンストラクタに通常状態の型情報を渡す
+                    GhostEye ghostEye = new GhostEye(this, originalType);
                     ghostEye.x = ghost.x;
                     ghostEye.y = ghost.y;
                     ghostEye.speed = ghost.speed;
-                    ghostEye.searchPath(9, 8);
                     ghostEye.isReturning = true;
                     this.ghost[i] = ghostEye;
-                    break;
+                }
+            }
+        }
+    }
+
+    public void revertGhostFromGhostEye(Entity ghostEye) {
+        for (int i = 0; i < this.ghost.length; i++) {
+            if (this.ghost[i] == ghostEye) {
+                System.out.println("Reverting ghost at index " + i + ", ghostEye: " + ghostEye);
+                Class<?> ghostEyeType = ((GhostEye) ghostEye).getOriginalGhostEyeType();
+                System.out.println("Original ghost type: " + ghostEyeType.getName());
+                Entity normalGhost = null;
+                if (ghostEyeType == RedGhost.class) {
+                    normalGhost = new RedGhost(this);
+                } else if (ghostEyeType == BlueGhost.class) {
+                    normalGhost = new BlueGhost(this);
+                } else if (ghostEyeType == OrangeGhost.class) {
+                    normalGhost = new OrangeGhost(this);
+                } else if (ghostEyeType == PinkGhost.class) {
+                    normalGhost = new PinkGhost(this);
+                }
+                if (normalGhost != null) {
+                    normalGhost.x = ghostEye.x;
+                    normalGhost.y = ghostEye.y;
+                    normalGhost.speed = ghostEye.speed;
+                    // 追加：必要なプロパティ(例：direction, isFrightenedなど)をコピー
+                    normalGhost.direction = ghostEye.direction; // もし必要なら
+                    System.out.println("Normal ghost created: " + normalGhost.getClass().getName());
+                    ghostEye.isReturning = false;
+                    this.ghost[i] = normalGhost;
+                    System.out.println("Ghost at index " + i + " is now reverted to normal ghost.");
                 }
             }
         }
@@ -364,5 +395,13 @@ public class GameWindow extends JPanel implements Window, Runnable {
 
     public PathFinder getPathFinder() {
         return pathFinder;
+    }
+
+    public int getMaxMap() {
+        return maxMap;
+    }
+
+    public int getCurrentMap() {
+        return currentMap;
     }
 }

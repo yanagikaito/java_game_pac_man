@@ -17,6 +17,7 @@ public class BlueGhost extends Entity {
 
     public BlueGhost(GameWindow gameWindow) {
         super(gameWindow);
+        this.originalGhostType = BlueGhost.class;
         direction = "right";
         speed = 2;
         loadGhostImages();
