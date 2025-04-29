@@ -110,11 +110,12 @@ public class Entity {
     public long invisibleStartTime = 0;
     public long invisibleDuration = 0;
     public boolean isReturning = false;
+    public boolean isEyeOnly = false;
 
     protected Class<?> originalGhostType;
 
-    public static final int BASE_COL = 9;
-    public static final int BASE_ROW = 8;
+    public static final int GOAL_COL = 9;
+    public static final int GOAL_ROW = 9;
 
     public static final String[] DIRECTIONS = {"up", "down", "left", "right"};
 
@@ -130,7 +131,7 @@ public class Entity {
     public void updateFrightenedMode() {
         if (isFrightened) {
             long elapsed = System.currentTimeMillis() - frightenedStartTime;
-            if (elapsed >= frightenedDuration + 100) {
+            if (elapsed >= frightenedDuration + 500) {
                 isFrightened = false;
                 isWarning = false;
             } else if (frightenedDuration - elapsed <= 1000) { // 残り1秒なら警告状態
@@ -176,7 +177,6 @@ public class Entity {
         }
     }
 
-    // 外部から呼び出してフライト状態に切り替える
     public void setFrightened(boolean frightened) {
         isFrightened = frightened;
         System.out.println("isFrightened = " + isFrightened);
@@ -186,7 +186,6 @@ public class Entity {
         }
     }
 
-    // 残り1秒の警告状態の設定（GameWindow などから呼び出す）
     public void setWarningMode(boolean warning) {
         isWarning = warning;
     }
@@ -202,14 +201,22 @@ public class Entity {
         int startCol = (x + solidArea.x) / FrameApp.createSize();
         int startRow = (y + solidArea.y) / FrameApp.createSize();
 
-        gameWindow.getPathFinder().setNodes(startCol, startRow, goalCol, goalRow, this);
+        System.out.println("startCol = " + startCol);
+        System.out.println("startRow = " + startRow);
+
+        gameWindow.getPathFinder().setNodes(
+                startCol, startRow,
+                goalCol, goalRow,
+                gameWindow.getTileManager().mapTileNum,
+                gameWindow.getTileManager().tile);
         gameWindow.getPathFinder().findPath();
 
         if (gameWindow.getPathFinder().isPathFound()) {
 
-            int nextX = gameWindow.getPathFinder().getPathList().getFirst().col * FrameApp.createSize();
-            int nextY = gameWindow.getPathFinder().getPathList().getFirst().row * FrameApp.createSize();
-
+            int nextX = gameWindow.getPathFinder().getPathPoints().get(0).x * FrameApp.createSize();
+            int nextY = gameWindow.getPathFinder().getPathPoints().get(0).y * FrameApp.createSize();
+            System.out.println("nextX = " + nextX);
+            System.out.println("nextY = " + nextX);
             int enLeftX = x + solidArea.x;
             int enRightX = x + solidArea.x + solidArea.width;
             int enTopY = y + solidArea.y;
@@ -252,8 +259,8 @@ public class Entity {
                 }
             }
 
-            int nextCol = gameWindow.getPathFinder().getPathList().getFirst().col;
-            int nextRow = gameWindow.getPathFinder().getPathList().getFirst().row;
+            int nextCol = gameWindow.getPathFinder().getPathPoints().get(0).x;
+            int nextRow = gameWindow.getPathFinder().getPathPoints().get(0).y;
             if (nextCol == goalCol && nextRow == goalRow) {
                 isReturning = false;
             }
@@ -309,7 +316,7 @@ public class Entity {
         return isReturning;
     }
 
-    public Class<?> getOriginalGhostType() {
-        return originalGhostType;
+    public Class<? extends Entity> getOriginalGhostType() {
+        return (Class<? extends Entity>) originalGhostType;
     }
 }
