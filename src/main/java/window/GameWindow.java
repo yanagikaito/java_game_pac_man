@@ -10,7 +10,6 @@ import frame.GameFrame;
 import game.GameOver;
 import key.KeyHandler;
 import sound.SoundManager;
-import tile.Tile;
 import tile.TileManager;
 import ui.ScorePopup;
 import ui.UI;
@@ -39,8 +38,6 @@ public class GameWindow extends JPanel implements Window, Runnable {
     private UI ui = new UI(this);
     private PathFinder pathFinder = new PathFinder(this);
     private List<ScorePopup> scorePopups = new ArrayList<>();
-    private final int maxMap = 10;
-    private int currentMap = 0;
     private boolean isPlayBackgroundMusic = false;
     private boolean isStartBGMPlaying = false;
     private boolean isPowerModeActive = false;
@@ -232,15 +229,17 @@ public class GameWindow extends JPanel implements Window, Runnable {
         for (int i = 0; i < ghost.length; i++) {
             if (ghost[i] == frightenedGhost) {
                 Entity normalGhost = null;
-                Class<?> originalType = ((BlueFrightened) frightenedGhost).getOriginalGhostType();
-
-                if (originalType == RedGhost.class) {
+                Class[] originalTypes = new Class[]{
+                        RedGhost.class, BlueGhost.class, OrangeGhost.class, PinkGhost.class
+                };
+                Class<? extends Entity> normalType = originalTypes[i];
+                if (normalType == RedGhost.class) {
                     normalGhost = new RedGhost(this);
-                } else if (originalType == BlueGhost.class) {
+                } else if (normalType == BlueGhost.class) {
                     normalGhost = new BlueGhost(this);
-                } else if (originalType == OrangeGhost.class) {
+                } else if (normalType == OrangeGhost.class) {
                     normalGhost = new OrangeGhost(this);
-                } else if (originalType == PinkGhost.class) {
+                } else if (normalType == PinkGhost.class) {
                     normalGhost = new PinkGhost(this);
                 }
 
@@ -259,54 +258,70 @@ public class GameWindow extends JPanel implements Window, Runnable {
         if (ghost != null) {
             score += 200;
             soundManager.playEatGhostWAV("res/sound/eat-ghost-sound.wav");
-
             addScorePopup(ghost.x, ghost.y, 200);
+
             ghost.setInvisible(1000);
             ghost.setFrightened(false);
 
+            // ゴーストの位置を基地（house）への初期位置に設定
+            ghost.x = FrameApp.createSize() * Entity.GOAL_COL;
+            ghost.y = FrameApp.createSize() * Entity.GOAL_ROW;
             ghost.isReturning = true;
 
             for (int i = 0; i < this.ghost.length; i++) {
                 if (this.ghost[i] == ghost) {
-                    Class<?> originalType = ((Entity) ghost).getOriginalGhostType();
-                    // GhostEye のコンストラクタに通常状態の型情報を渡す
-                    GhostEye ghostEye = new GhostEye(this, originalType);
-                    ghostEye.x = ghost.x;
-                    ghostEye.y = ghost.y;
-                    ghostEye.speed = ghost.speed;
-                    ghostEye.isReturning = true;
-                    this.ghost[i] = ghostEye;
+                    Class<? extends Entity>[] targetTypes;
+                    if (ghost instanceof BlueFrightened) {
+                        targetTypes = new Class[]{RedGhost.class, BlueGhost.class, OrangeGhost.class, PinkGhost.class};
+                    } else {
+                        targetTypes = new Class[]{ghost.getClass()};
+                    }
+                    Entity ghostEyeInstance = new GhostEye(this, targetTypes[i], targetTypes);
+                    ghostEyeInstance.x = ghost.x;
+                    ghostEyeInstance.y = ghost.y;
+                    ghostEyeInstance.speed = ghost.speed;
+                    ghostEyeInstance.searchPath(Entity.GOAL_COL, Entity.GOAL_ROW);
+                    ghostEyeInstance.isReturning = true;
+
+                    this.ghost[i] = ghostEyeInstance;
                 }
             }
         }
     }
 
-    public void revertGhostFromGhostEye(Entity ghostEye) {
+
+    public void revertGhostFromGhostEye(Entity ghost) {
+        if (!(ghost instanceof GhostEye)) {
+            System.out.println("警告: revertGhostFromGhostEye() に渡されたオブジェクトは GhostEye のインスタンスではありません。");
+            return;
+        }
         for (int i = 0; i < this.ghost.length; i++) {
-            if (this.ghost[i] == ghostEye) {
-                System.out.println("Reverting ghost at index " + i + ", ghostEye: " + ghostEye);
-                Class<?> ghostEyeType = ((GhostEye) ghostEye).getOriginalGhostEyeType();
-                System.out.println("Original ghost type: " + ghostEyeType.getName());
+            if (this.ghost[i].equals(ghost)) {
+                Class<? extends Entity> originalType = null;
+                if (ghost instanceof GhostEye) {
+                    originalType = ((GhostEye) ghost).getOriginalGhostType();
+                    if (originalType == null) {
+                        originalType = ghost.getClass();
+                    }
+                }
                 Entity normalGhost = null;
-                if (ghostEyeType == RedGhost.class) {
+                if (originalType == RedGhost.class) {
                     normalGhost = new RedGhost(this);
-                } else if (ghostEyeType == BlueGhost.class) {
+                } else if (originalType == BlueGhost.class) {
                     normalGhost = new BlueGhost(this);
-                } else if (ghostEyeType == OrangeGhost.class) {
+                } else if (originalType == OrangeGhost.class) {
                     normalGhost = new OrangeGhost(this);
-                } else if (ghostEyeType == PinkGhost.class) {
+                } else if (originalType == PinkGhost.class) {
                     normalGhost = new PinkGhost(this);
                 }
+
                 if (normalGhost != null) {
-                    normalGhost.x = ghostEye.x;
-                    normalGhost.y = ghostEye.y;
-                    normalGhost.speed = ghostEye.speed;
-                    // 追加：必要なプロパティ(例：direction, isFrightenedなど)をコピー
-                    normalGhost.direction = ghostEye.direction; // もし必要なら
-                    System.out.println("Normal ghost created: " + normalGhost.getClass().getName());
-                    ghostEye.isReturning = false;
+                    normalGhost.x = ghost.x;
+                    normalGhost.y = ghost.y;
+                    normalGhost.speed = ghost.speed;
+                    normalGhost.direction = ghost.direction;
+                    ghost.isReturning = false;
                     this.ghost[i] = normalGhost;
-                    System.out.println("Ghost at index " + i + " is now reverted to normal ghost.");
                 }
             }
         }
@@ -395,13 +410,5 @@ public class GameWindow extends JPanel implements Window, Runnable {
 
     public PathFinder getPathFinder() {
         return pathFinder;
-    }
-
-    public int getMaxMap() {
-        return maxMap;
-    }
-
-    public int getCurrentMap() {
-        return currentMap;
     }
 }

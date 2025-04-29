@@ -131,10 +131,11 @@ public class CollisionChecker {
         }
 
         // 衝突判定
-        if (entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
+        if (!entity.isEyeOnly && entity.solidArea.intersects(gameWindow.getPlayer().solidArea)) {
             entity.collision = true;
             if (entity.isFrightened == true || entity.isWarning == true) {
                 gameWindow.eatGhost(entity);
+                entity.isEyeOnly = true;
             } else {
                 gameWindow.setGameState(gameWindow.getGameOverState());
                 gameWindow.getGameOver().triggerGameOver();

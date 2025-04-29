@@ -131,8 +131,4 @@ public class BlueFrightened extends Entity {
             g2.drawImage(image, x, y, FrameApp.createSize(), FrameApp.createSize(), null);
         }
     }
-
-    public Class<?> getOriginalGhostType() {
-        return originalGhostType;
-    }
 }

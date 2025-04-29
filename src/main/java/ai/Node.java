@@ -3,20 +3,27 @@ package ai;
 public class Node {
 
     public int col, row;
-    public double gCost = 999999;
-    public double hCost = 0;
-    public double fCost = 999999;
-    public Node parent = null;
-
-    // 探索時のフラグ
-    public boolean open = false;
-    public boolean checked = false;
-
-    // 壁など通行不可かどうか
-    public boolean solid = false;
+    public boolean open, checked, solid;
+    public double gCost, hCost, fCost;
+    public Node parent;
 
     public Node(int col, int row) {
         this.col = col;
         this.row = row;
+        this.open = false;
+        this.checked = false;
+        this.solid = false;
+        this.gCost = 999999;
+        this.hCost = 0;
+        this.fCost = 999999;
+        this.parent = null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Node other = (Node) obj;
+        return this.col == other.col && this.row == other.row;
     }
 }
