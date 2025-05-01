@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="java_game_pac_man:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/java_game_pac_man_jar</output-path>
+    <root id="archive" name="java_game_pac_man.jar">
+      <element id="module-output" name="java_game_pac_man" />
+    </root>
+  </artifact>
+</component>
